@@ -1,72 +1,42 @@
-// Settings management module - Updated with team tab
+// Settings functionality module
 const Settings = {
-    measurementTemplates: {
-        shirt: {
-            chest: 'Chest',
-            waist: 'Waist',
-            hips: 'Hips',
-            shoulder: 'Shoulder',
-            sleeve: 'Sleeve Length',
-            length: 'Length'
-        },
-        pant: {
-            waist: 'Waist',
-            hips: 'Hips',
-            thigh: 'Thigh',
-            knee: 'Knee',
-            ankle: 'Ankle',
-            length: 'Length'
-        },
-        suit: {
-            chest: 'Chest',
-            waist: 'Waist',
-            hips: 'Hips',
-            shoulder: 'Shoulder',
-            sleeve: 'Sleeve Length',
-            length: 'Length'
-        },
-        dress: {
-            bust: 'Bust',
-            waist: 'Waist',
-            hips: 'Hips',
-            shoulder: 'Shoulder',
-            sleeve: 'Sleeve Length',
-            length: 'Length'
-        }
-    },
+    currentTab: 'measurement',
 
     init() {
         this.loadSettings();
         this.bindEvents();
-        this.showSettingsTab('measurement'); // Show measurement tab by default
+        this.loadCustomFields();
     },
 
-    showSettingsTab(tabName) {
-        // Update active tab button
-        document.querySelectorAll('.settings-tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    loadSettings() {
+        const data = Storage.getAllData();
         
-        // Hide all settings cards
-        document.querySelectorAll('.settings-card').forEach(card => {
-            card.style.display = 'none';
-        });
-        
-        // Show selected tab content
-        let cardIndex;
-        switch(tabName) {
-            case 'measurement':
-                cardIndex = 1;
-                break;
-            case 'team':
-                cardIndex = 6;
-                break;
+        // Load size format
+        const sizeFormat = data.sizeFormat || 'inches';
+        const sizeFormatElement = document.getElementById('sizeFormatSettings');
+        if (sizeFormatElement) {
+            sizeFormatElement.value = sizeFormat;
         }
         
-        const targetCard = document.querySelector(`.settings-card:nth-child(${cardIndex})`);
-        if (targetCard) {
-            targetCard.style.display = 'block';
+        // Load date format
+        const dateFormat = data.dateFormat || 'MM/DD/YYYY';
+        const dateFormatElement = document.getElementById('dateFormatSettings');
+        if (dateFormatElement) {
+            dateFormatElement.value = dateFormat;
+        }
+        
+        // Load theme
+        const theme = data.theme || 'light';
+        const themeElement = document.getElementById('themeSettings');
+        if (themeElement) {
+            themeElement.value = theme;
+        }
+        
+        // Load language
+        const language = data.language || 'en';
+        const languageElement = document.getElementById('languageSettings');
+        if (languageElement) {
+            languageElement.value = language;
         }
     },
 
@@ -74,220 +44,87 @@ const Settings = {
         // Settings tab navigation
         document.querySelectorAll('.settings-tab-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
-                const tabName = e.currentTarget.getAttribute('data-tab');
-                this.showSettingsTab(tabName);
+                const tab = e.currentTarget.getAttribute('data-tab');
+                this.showSettingsTab(tab);
+            });
+        });
+
+        // Size format change
+        const sizeFormatElement = document.getElementById('sizeFormatSettings');
+        if (sizeFormatElement) {
+            sizeFormatElement.addEventListener('change', (e) => {
+                const data = Storage.getAllData();
+                data.sizeFormat = e.target.value;
+                Storage.saveAllData(data);
+                this.showNotification('Size format updated', 'success');
                 
-                // Update active tab button
-                document.querySelectorAll('.settings-tab-btn').forEach(b => b.classList.remove('active'));
-                e.currentTarget.classList.add('active');
+                // Refresh measurements if module is loaded
+                if (typeof Measurements !== 'undefined') {
+                    Measurements.loadMeasurements();
+                }
             });
-        });
-
-        // Size format settings
-        document.getElementById('sizeFormatSettings').addEventListener('change', (e) => {
-            this.saveSizeFormat(e.target.value);
-        });
-
-        // Date format settings
-        document.getElementById('dateFormatSettings').addEventListener('change', (e) => {
-            this.saveDateFormat(e.target.value);
-        });
-
-        // Theme settings
-        document.querySelectorAll('.theme-option').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const theme = e.currentTarget.getAttribute('data-theme');
-                this.setTheme(theme);
+        }
+        
+        // Date format change
+        const dateFormatElement = document.getElementById('dateFormatSettings');
+        if (dateFormatElement) {
+            dateFormatElement.addEventListener('change', (e) => {
+                const data = Storage.getAllData();
+                data.dateFormat = e.target.value;
+                Storage.saveAllData(data);
+                this.showNotification('Date format updated', 'success');
             });
-        });
-
-        // Language settings
-        document.getElementById('languageSettings').addEventListener('click', (e) => {
-            this.setLanguage(e.target.value);
-        });
-    },
-
-    loadSettings() {
-        this.loadSizeFormat();
-        this.loadDateFormat();
-        this.loadDefaultFields();
-        this.loadCustomFields();
-        this.loadTheme();
-        this.loadLanguage();
-        this.loadTeamSettings();
-    },
-
-    loadTeamSettings() {
-        // Initialize team module if available
-        if (typeof Team !== 'undefined') {
-            Team.init();
         }
     },
 
-    loadSizeFormat() {
-        const format = this.getSizeFormat();
-        document.getElementById('sizeFormatSettings').value = format;
-    },
-
-    loadDateFormat() {
-        const format = this.getDateFormat();
-        document.getElementById('dateFormatSettings').value = format;
-    },
-
-    loadDefaultFields() {
-        const container = document.getElementById('defaultFieldsSettings');
-        let html = '';
+    showSettingsTab(tabName) {
+        this.currentTab = tabName;
         
-        Object.entries(this.measurementTemplates).forEach(([type, fields]) => {
-            html += `<div style="margin-bottom: 1rem;"><h5 style="text-transform: capitalize; color: var(--text-secondary);">${type}:</h5>`;
-            Object.entries(fields).forEach(([key, label]) => {
-                html += `
-                    <div class="field-item">
-                        <span>${label}</span>
-                        <span class="field-type">Default</span>
-                    </div>
-                `;
-            });
-            html += '</div>';
+        // Update active tab button
+        document.querySelectorAll('.settings-tab-btn').forEach(btn => {
+            btn.classList.remove('active');
         });
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
         
-        container.innerHTML = html;
+        // Show corresponding content
+        const containers = document.querySelectorAll('.settings-container > div');
+        containers.forEach(container => container.style.display = 'none');
+        
+        // Show the selected tab content
+        if (tabName === 'measurement') {
+            document.getElementById('measurementSettings').style.display = 'block';
+        }
     },
 
     loadCustomFields() {
         const data = Storage.getAllData();
+        const defaultFields = data.defaultMeasurementFields || [];
         const customFields = data.customMeasurementFields || [];
-        const container = document.getElementById('customFieldsSettings');
         
-        if (customFields.length === 0) {
-            container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">No custom fields added yet.</p>';
-            return;
-        }
-        
-        container.innerHTML = customFields.map(field => `
-            <div class="field-item">
-                <span>${field.label}</span>
-                <div class="field-actions">
-                    <button class="btn btn-sm btn-danger" onclick="Settings.removeCustomField('${field.key}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
+        // Render default fields
+        const defaultContainer = document.getElementById('defaultFieldsSettings');
+        if (defaultContainer) {
+            defaultContainer.innerHTML = defaultFields.map(field => `
+                <div class="field-item">
+                    <span>${field.label}</span>
+                    <span class="field-type">Default</span>
                 </div>
-            </div>
-        `).join('');
-    },
-
-    loadTheme() {
-        const savedTheme = localStorage.getItem('selectedTheme') || 'light';
-        document.querySelectorAll('.theme-option').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.theme === savedTheme) {
-                btn.classList.add('active');
-            }
-        });
-    },
-
-    loadLanguage() {
-        const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
-        document.getElementById('languageSettings').value = savedLanguage;
-    },
-
-    saveSizeFormat(format) {
-        const data = Storage.getAllData();
-        data.sizeFormat = format;
-        Storage.saveAllData(data);
-        
-        // Refresh measurements if the module is loaded
-        if (typeof Measurements !== 'undefined') {
-            if (typeof Measurements.loadMeasurements === 'function') {
-                Measurements.loadMeasurements();
-            }
-            // Also update the current modal if open
-            const modal = document.getElementById('measurementModal');
-            if (modal && modal.style.display === 'block') {
-                const clothingType = document.getElementById('clothingType').value;
-                if (clothingType) {
-                    Measurements.updateMeasurementFields(clothingType);
-                }
-            }
-        }
-    },
-
-    saveDateFormat(format) {
-        const data = Storage.getAllData();
-        data.dateFormat = format;
-        Storage.saveAllData(data);
-        
-        // Refresh all date displays
-        this.refreshAllDateDisplays();
-    },
-
-    getSizeFormat() {
-        const data = Storage.getAllData();
-        return data.sizeFormat || 'inches';
-    },
-
-    getDateFormat() {
-        const data = Storage.getAllData();
-        return data.dateFormat || 'MM/DD/YYYY';
-    },
-
-    refreshAllDateDisplays() {
-        // Refresh dashboard stats
-        if (typeof Dashboard !== 'undefined') {
-            Dashboard.updateStats();
+            `).join('');
         }
         
-        // Refresh measurements
-        if (typeof Measurements !== 'undefined') {
-            Measurements.loadMeasurements();
-        }
-        
-        // Refresh orders
-        if (typeof Orders !== 'undefined') {
-            Orders.loadOrders();
-        }
-        
-        // Refresh team members
-        if (typeof Team !== 'undefined') {
-            Team.loadTeam();
-        }
-        
-        // Refresh export tables
-        if (typeof Export !== 'undefined') {
-            const activeTable = document.querySelector('.table-type-btn.active');
-            if (activeTable) {
-                Export.loadTableView(activeTable.dataset.type);
-            }
-        }
-    },
-
-    setTheme(theme) {
-        document.documentElement.setAttribute('data-theme', theme);
-        localStorage.setItem('selectedTheme', theme);
-        
-        // Update theme button states
-        document.querySelectorAll('.theme-option').forEach(btn => {
-            btn.classList.remove('active');
-            if (btn.dataset.theme === theme) {
-                btn.classList.add('active');
-            }
-        });
-        
-        // Update main theme toggle
-        const themeToggle = document.getElementById('themeToggle');
-        if (themeToggle) {
-            const icon = themeToggle.querySelector('i');
-            icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-        }
-    },
-
-    setLanguage(language) {
-        localStorage.setItem('selectedLanguage', language);
-        
-        if (language !== 'en') {
-            TranslationManager.translatePage(language);
-        } else {
-            location.reload();
+        // Render custom fields
+        const customContainer = document.getElementById('customFieldsSettings');
+        if (customContainer) {
+            customContainer.innerHTML = customFields.map(field => `
+                <div class="field-item">
+                    <span>${field.label}</span>
+                    <div class="field-actions">
+                        <button class="btn btn-sm btn-danger" onclick="Settings.removeCustomField('${field.key}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
         }
     },
 
@@ -320,10 +157,9 @@ const Settings = {
         Storage.saveAllData(data);
         
         input.value = '';
-        this.loadCustomFields();
         
-        // Show success notification
-        this.showNotification(`Field "${fieldName}" added successfully!`, 'success');
+        this.loadCustomFields();
+        this.showNotification(`Field "${fieldName}" added`, 'success');
         
         // Refresh measurements if the module is loaded
         if (typeof Measurements !== 'undefined') {
@@ -372,59 +208,43 @@ const Settings = {
             <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
             <span>${message}</span>
         `;
-        
-        // Add styles
         notification.style.cssText = `
             position: fixed;
             top: 20px;
             right: 20px;
+            background: var(--${type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'info'}-color);
+            color: white;
             padding: 1rem 1.5rem;
             border-radius: 8px;
-            color: white;
             font-weight: 500;
             z-index: 10000;
-            transform: translateX(100%);
-            transition: transform 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
         `;
-        
-        // Set background color based on type
-        const colors = {
-            success: '#27ae60',
-            warning: '#f39c12',
-            info: '#3498db'
-        };
-        notification.style.backgroundColor = colors[type] || colors.info;
         
         document.body.appendChild(notification);
         
-        // Animate in
         setTimeout(() => {
-            notification.style.transform = 'translateX(0)';
-        }, 100);
-        
-        // Remove after delay
-        setTimeout(() => {
-            notification.style.transform = 'translateX(100%)';
-            setTimeout(() => {
+            if (document.body.contains(notification)) {
                 document.body.removeChild(notification);
-            }, 300);
+            }
         }, 3000);
     },
 
     exportData() {
         const data = Storage.getAllData();
-        const exportData = JSON.stringify(data, null, 2);
-        const blob = new Blob([exportData], { type: 'application/json' });
+        const dataStr = JSON.stringify(data, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = `tailor_data_${new Date().toISOString().split('T')[0]}.json`;
         a.click();
         window.URL.revokeObjectURL(url);
+        this.showNotification('Data exported successfully', 'success');
     },
 
     importData() {
@@ -433,17 +253,22 @@ const Settings = {
         input.accept = '.json';
         input.onchange = (e) => {
             const file = e.target.files[0];
-            if (!file) return;
-            
             const reader = new FileReader();
-            reader.onload = (e) => {
+            reader.onload = (event) => {
                 try {
-                    const data = JSON.parse(e.target.result);
+                    const data = JSON.parse(event.target.result);
                     Storage.saveAllData(data);
-                    alert('Data imported successfully!');
-                    location.reload();
+                    this.loadSettings();
+                    this.showNotification('Data imported successfully', 'success');
+                    
+                    // Refresh all modules
+                    if (typeof Customers !== 'undefined') Customers.loadCustomers();
+                    if (typeof Measurements !== 'undefined') Measurements.loadMeasurements();
+                    if (typeof Orders !== 'undefined') Orders.loadOrders();
+                    if (typeof Team !== 'undefined') Team.loadTeam();
+                    if (typeof Dashboard !== 'undefined') Dashboard.updateStats();
                 } catch (error) {
-                    alert('Error importing data. Please check the file format.');
+                    this.showNotification('Invalid data file', 'error');
                 }
             };
             reader.readAsText(file);
@@ -455,33 +280,22 @@ const Settings = {
         CustomPopup.show({
             icon: 'fas fa-exclamation-triangle',
             title: 'Reset All Data',
-            message: 'Are you sure you want to reset all data? This will delete all customers, measurements, and orders. This action cannot be undone.',
-            confirmText: 'Reset All Data',
+            message: 'Are you absolutely sure? This will delete ALL customers, measurements, orders, and team members. This action cannot be undone.',
+            confirmText: 'Reset Everything',
             confirmClass: 'btn-danger',
             onConfirm: () => {
-                const defaultData = {
-                    customers: [],
-                    measurements: [],
-                    orders: [],
-                    teamMembers: [],
-                    nextCustomerId: 1,
-                    nextMeasurementId: 1,
-                    nextOrderId: 1,
-                    sizeFormat: 'inches',
-                    customMeasurementFields: []
-                };
-                Storage.saveAllData(defaultData);
-                alert('All data has been reset!');
-                location.reload();
+                localStorage.removeItem('tailorData');
+                Storage.init();
+                this.loadSettings();
+                this.showNotification('All data has been reset', 'info');
+                
+                // Refresh all modules
+                if (typeof Customers !== 'undefined') Customers.loadCustomers();
+                if (typeof Measurements !== 'undefined') Measurements.loadMeasurements();
+                if (typeof Orders !== 'undefined') Orders.loadOrders();
+                if (typeof Team !== 'undefined') Team.loadTeam();
+                if (typeof Dashboard !== 'undefined') Dashboard.updateStats();
             }
         });
     }
 };
-
-// Initialize settings when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize Settings module
-    if (typeof Settings !== 'undefined') {
-        Settings.init();
-    }
-});

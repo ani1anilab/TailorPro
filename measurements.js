@@ -3,38 +3,8 @@ const Measurements = {
     currentMeasurements: [],
     customMeasurementFields: [],
     measurementTemplates: {
-        shirt: {
-            chest: 'Chest',
-            waist: 'Waist',
-            hips: 'Hips',
-            shoulder: 'Shoulder',
-            sleeve: 'Sleeve Length',
-            length: 'Length'
-        },
-        pant: {
-            waist: 'Waist',
-            hips: 'Hips',
-            thigh: 'Thigh',
-            knee: 'Knee',
-            ankle: 'Ankle',
-            length: 'Length'
-        },
-        suit: {
-            chest: 'Chest',
-            waist: 'Waist',
-            hips: 'Hips',
-            shoulder: 'Shoulder',
-            sleeve: 'Sleeve Length',
-            length: 'Length'
-        },
-        dress: {
-            bust: 'Bust',
-            waist: 'Waist',
-            hips: 'Hips',
-            shoulder: 'Shoulder',
-            sleeve: 'Sleeve Length',
-            length: 'Length'
-        }
+        // Remove all default templates - only custom fields will be used
+        other: {} // Empty template for custom clothing type
     },
 
     init() {
@@ -42,6 +12,23 @@ const Measurements = {
         this.loadCustomFields();
         this.bindEvents();
         this.populateCustomerSelects();
+        // Set default to 'other' and hide the clothing type selector
+        this.setDefaultClothingType();
+    },
+
+    setDefaultClothingType() {
+        // Hide the clothing type dropdown container
+        const clothingTypeGroup = document.getElementById('clothingType').closest('.form-group');
+        if (clothingTypeGroup) {
+            clothingTypeGroup.style.display = 'none';
+        }
+        
+        // Set clothing type to 'other' and show custom type container
+        document.getElementById('clothingType').value = 'other';
+        document.getElementById('customTypeContainer').style.display = 'block';
+        
+        // Update measurement fields for 'other' type (which will now be empty)
+        this.updateMeasurementFields('other');
     },
 
     bindEvents() {
@@ -137,25 +124,33 @@ const Measurements = {
 
             select.value = currentValue;
         });
+
+        // Refresh searchable dropdowns
+        if (typeof SearchableSelect !== 'undefined') {
+            selects.forEach(select => {
+                SearchableSelect.refreshDropdown(select);
+            });
+        }
     },
 
     getMeasurementTemplateWithCustomFields(clothingType) {
-        const baseTemplate = { ...this.measurementTemplates[clothingType] || this.measurementTemplates['shirt'] };
+        // Only return custom fields - no default templates
+        const customFieldsOnly = {};
         
         // Add custom fields to the template
         this.customMeasurementFields.forEach(field => {
-            baseTemplate[field.key] = field.label;
+            customFieldsOnly[field.key] = field.label;
         });
         
-        return baseTemplate;
+        return customFieldsOnly;
     },
 
     updateMeasurementFields(clothingType) {
         const container = document.getElementById('measurementFields');
         const template = this.getMeasurementTemplateWithCustomFields(clothingType);
 
-        if (!template) {
-            container.innerHTML = '';
+        if (!template || Object.keys(template).length === 0) {
+            container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem;" data-translate="no_custom_fields">No custom measurement fields added yet. Please add custom fields in Settings > Measurements.</p>';
             return;
         }
 
@@ -192,8 +187,14 @@ const Measurements = {
         } else {
             form.reset();
             document.getElementById('measurementId').value = '';
-            document.getElementById('customTypeContainer').style.display = 'none';
-            this.updateMeasurementFields('shirt');
+            // Keep the default behavior for new measurements
+            this.setDefaultClothingType();
+        }
+
+        // Update modal title
+        const modalTitle = modal.querySelector('h3');
+        if (modalTitle) {
+            modalTitle.setAttribute('data-translate', measurement ? 'edit_measurement' : 'add_measurement');
         }
 
         modal.style.display = 'block';
@@ -222,10 +223,11 @@ const Measurements = {
 
         // Collect measurement values
         const measurements = {};
-        const template = this.measurementTemplates[clothingType];
+        // Use the correct template that includes custom fields
+        const template = this.getMeasurementTemplateWithCustomFields(clothingType);
         Object.keys(template).forEach(key => {
             const input = document.getElementById(`measurement_${key}`);
-            if (input) measurements[key] = parseFloat(input.value);
+            if (input && input.value) measurements[key] = parseFloat(input.value);
         });
 
         const measurementData = {
@@ -241,7 +243,12 @@ const Measurements = {
             const existing = this.currentMeasurements.find(m => m.id === parseInt(measurementId));
             if (existing) {
                 Object.assign(existing, measurementData);
-                Storage.saveAllData(Storage.getAllData());
+                const data = Storage.getAllData();
+                const measurementIndex = data.measurements.findIndex(m => m.id === parseInt(measurementId));
+                if (measurementIndex !== -1) {
+                    data.measurements[measurementIndex] = existing;
+                    Storage.saveAllData(data);
+                }
             }
         } else {
             // Add new measurement
@@ -250,6 +257,11 @@ const Measurements = {
 
         this.loadMeasurements();
         this.hideMeasurementModal();
+        
+        // Translate any new dynamic content
+        if (typeof TranslationManager !== 'undefined') {
+            TranslationManager.translateDynamicContent(document.getElementById('measurementsList'));
+        }
     },
 
     renderMeasurements(filteredMeasurements = null) {
@@ -258,13 +270,17 @@ const Measurements = {
         const sizeUnit = this.getSizeUnit();
         
         if (measurements.length === 0) {
-            container.innerHTML = '<p class="empty-state">No measurements found. Add a new measurement to get started.</p>';
+            container.innerHTML = '<p class="empty-state" data-translate="no_measurements">No measurements found. Add a new measurement to get started.</p>';
             return;
         }
 
         container.innerHTML = measurements.map(measurement => {
             const customer = Storage.getCustomers().find(c => c.id === measurement.customerId);
-            const template = this.measurementTemplates[measurement.clothingType] || this.measurementTemplates['shirt'];
+            
+            // Get all measurement fields (custom + default) to look up labels by key
+            const data = Storage.getAllData();
+            const customFields = data.customMeasurementFields || [];
+
             const displayType = measurement.clothingType === 'other' && measurement.customType 
                 ? measurement.customType 
                 : measurement.clothingType;
@@ -273,29 +289,40 @@ const Measurements = {
                 <div class="measurement-card">
                     <div class="measurement-header">
                         <div>
-                            <h4>${customer ? customer.name : 'Unknown Customer'}</h4>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;">
+                            <h4 data-auto-translate="true">${customer ? customer.name : 'Unknown Customer'}</h4>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin: 0;" data-auto-translate="true">
                                 ${customer ? `${customer.phone} • ${customer.village}` : ''}
                             </p>
                         </div>
-                        <span class="clothing-type">${displayType}</span>
+                        <span class="clothing-type" data-auto-translate="true">${displayType}</span>
                     </div>
                     <div class="measurement-values">
-                        ${Object.entries(measurement.measurements).map(([key, value]) => `
+                        ${Object.entries(measurement.measurements).map(([key, value]) => {
+                            const field = customFields.find(f => f.key === key);
+                            const label = field ? field.label : key;
+                            return `
                             <div class="measurement-item">
-                                <span class="measurement-label">${template[key] || key}:</span>
+                                <span class="measurement-label" data-auto-translate="true">${label}:</span>
                                 <span class="measurement-value">${value}${sizeUnit}</span>
                             </div>
-                        `).join('')}
+                        `}).join('')}
                     </div>
                     <div class="measurement-actions">
                         <button class="btn btn-sm btn-secondary" onclick="Measurements.editMeasurement(${measurement.id})">
-                            <i class="fas fa-edit"></i> Edit
+                            <i class="fas fa-edit"></i> <span class="action-text">Edit</span>
+                        </button>
+                        <button class="btn btn-sm btn-danger" onclick="Measurements.deleteMeasurement(${measurement.id})">
+                            <i class="fas fa-trash"></i> <span class="action-text">Delete</span>
                         </button>
                     </div>
                 </div>
             `;
         }).join('');
+
+        // Translate any dynamic content just rendered
+        if (typeof TranslationManager !== 'undefined') {
+            TranslationManager.translateDynamicContent(container);
+        }
     },
 
     filterByCustomer(customerId) {
@@ -306,6 +333,25 @@ const Measurements = {
 
         const filtered = this.currentMeasurements.filter(m => m.customerId === parseInt(customerId));
         this.renderMeasurements(filtered);
+        
+        // Update the customer select dropdown to show the selected customer
+        const filterSelect = document.getElementById('measurementCustomerSelect');
+        if (filterSelect) {
+            filterSelect.value = customerId;
+        }
+
+        // Clear search input in searchable select
+        const wrapper = filterSelect?.closest('.searchable-select-wrapper');
+        if (wrapper) {
+            const searchInput = wrapper.querySelector('.select-search-input');
+            if (searchInput) {
+                // Find the selected option text and set it
+                const selectedOption = filterSelect.options[filterSelect.selectedIndex];
+                if (selectedOption) {
+                    searchInput.value = selectedOption.textContent;
+                }
+            }
+        }
     },
 
     searchMeasurements(query) {
@@ -341,6 +387,34 @@ const Measurements = {
         if (measurement) {
             this.showMeasurementModal(measurement);
         }
+    },
+
+    deleteMeasurement(id) {
+        const measurement = this.currentMeasurements.find(m => m.id === id);
+        if (!measurement) return;
+        
+        const customer = Storage.getCustomers().find(c => c.id === measurement.customerId);
+        const customerName = customer ? customer.name : 'Unknown Customer';
+        
+        CustomPopup.show({
+            icon: 'fas fa-trash',
+            title: 'Delete Measurement',
+            message: `Are you sure you want to delete this measurement for ${customerName}? This action cannot be undone.`,
+            confirmText: 'Delete',
+            confirmClass: 'btn-danger',
+            onConfirm: () => {
+                const data = Storage.getAllData();
+                data.measurements = data.measurements.filter(m => m.id !== id);
+                Storage.saveAllData(data);
+                this.loadMeasurements();
+                
+                // Translate any updated content
+                if (typeof TranslationManager !== 'undefined') {
+                    const container = document.getElementById('measurementsList');
+                    TranslationManager.translateDynamicContent(container);
+                }
+            }
+        });
     },
 
     showCustomFieldsModal() {

@@ -25,26 +25,28 @@ const Orders = {
         const container = document.getElementById('ordersList');
         
         if (this.currentOrders.length === 0) {
-            container.innerHTML = '<p class="empty-state">No orders found. Add a new order to get started.</p>';
+            container.innerHTML = '<p class="empty-state" data-translate="no_orders">No orders found. Add a new order to get started.</p>';
             return;
         }
 
         container.innerHTML = this.currentOrders.map(order => {
-            const customer = Storage.getCustomers().find(c => c.id === order.customerId);
-            const teamMember = Team.getTeamMemberById(order.teamMemberId);
+            const customers = Storage.getCustomers();
+            const customer = customers.find(c => c.id === order.customerId);
+            const teamMembers = Storage.getAllData().teamMembers || [];
+            const teamMember = teamMembers.find(m => m.id === order.teamMemberId);
             const statusClass = `status-${order.status}`;
             
             return `
                 <div class="order-card">
                     <div class="order-header">
-                        <h4>${customer ? customer.name : 'Unknown Customer'}</h4>
-                        <span class="order-status ${statusClass}">${order.status}</span>
+                        <h4 data-auto-translate="true">${customer ? customer.name : 'Unknown Customer'}</h4>
+                        <span class="order-status ${statusClass}" data-auto-translate="true">${order.status}</span>
                     </div>
-                    <p class="order-description">${order.description}</p>
+                    <p class="order-description" data-auto-translate="true">${order.description}</p>
                     ${teamMember ? `
                         <div style="margin-bottom: 1rem;">
-                            <small style="color: var(--text-secondary);">
-                                <i class="fas fa-user"></i> Assigned to: ${teamMember.name} (${teamMember.role})
+                            <small style="color: var(--text-secondary);" data-auto-translate="true">
+                                Assigned to: ${teamMember.name} (${teamMember.role})
                             </small>
                         </div>
                     ` : ''}
@@ -54,10 +56,10 @@ const Orders = {
                     </div>
                     <div class="order-actions">
                         <button class="btn btn-sm btn-secondary" onclick="Orders.editOrder(${order.id})">
-                            <i class="fas fa-edit"></i> Edit
+                            <i class="fas fa-edit"></i> <span class="action-text" data-auto-translate="true">Edit</span>
                         </button>
                         <button class="btn btn-sm btn-primary" onclick="Orders.updateStatus(${order.id})">
-                            <i class="fas fa-sync"></i> Update Status
+                            <i class="fas fa-sync"></i> <span class="action-text" data-auto-translate="true" data-translate="update_status">Update Status</span>
                         </button>
                     </div>
                 </div>
@@ -81,11 +83,37 @@ const Orders = {
             document.getElementById('orderId').value = '';
         }
 
+        // Populate team member dropdown
+        this.populateTeamMemberSelects();
+
         modal.style.display = 'block';
     },
 
     hideOrderModal() {
         document.getElementById('orderModal').style.display = 'none';
+    },
+
+    populateTeamMemberSelects() {
+        const teamMembers = Storage.getAllData().teamMembers || [];
+        const selects = [
+            document.getElementById('orderTeamMember')
+        ];
+
+        selects.forEach(select => {
+            if (!select) return;
+            
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select Team Member (Optional)</option>';
+            
+            teamMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = `${member.name} (${member.role})`;
+                select.appendChild(option);
+            });
+
+            select.value = currentValue;
+        });
     },
 
     handleOrderSubmit(e) {

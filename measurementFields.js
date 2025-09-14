@@ -62,12 +62,12 @@ const MeasurementFields = {
     renderDefaultFieldsList() {
         let html = '';
         Object.entries(Measurements.measurementTemplates).forEach(([type, fields]) => {
-            html += `<div style="margin-bottom: 1rem;"><h5 style="text-transform: capitalize; color: var(--text-secondary);">${type}:</h5>`;
+            html += `<div style="margin-bottom: 1rem;"><h5 style="text-transform: capitalize; color: var(--text-secondary);" data-translate="clothing_type_${type}">${type}:</h5>`;
             Object.entries(fields).forEach(([key, label]) => {
                 html += `
                     <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 5px; margin-bottom: 0.25rem;">
-                        <span>${label}</span>
-                        <span style="color: var(--text-secondary); font-size: 0.8rem;">Default</span>
+                        <span data-translate="measurement_${key}">${label}</span>
+                        <span style="color: var(--text-secondary); font-size: 0.8rem;" data-translate="default">Default</span>
                     </div>
                 `;
             });
@@ -81,12 +81,12 @@ const MeasurementFields = {
         const customFields = data.customMeasurementFields || [];
         
         if (customFields.length === 0) {
-            return '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;">No custom fields added yet.</p>';
+            return '<p style="color: var(--text-secondary); text-align: center; padding: 1rem;" data-translate="no_custom_fields">No custom fields added yet.</p>';
         }
         
         return customFields.map(field => `
             <div class="field-item">
-                <span>${field.label}</span>
+                <span data-translate="custom_field_${field.key}">${field.label}</span>
                 <div class="field-actions">
                     <button class="btn btn-sm btn-danger" onclick="MeasurementFields.removeCustomField('${field.key}')">
                         <i class="fas fa-trash"></i>

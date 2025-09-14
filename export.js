@@ -15,16 +15,16 @@ const Export = {
         tableViewContainer.className = 'table-view-container';
         tableViewContainer.innerHTML = `
             <div class="section-header" style="margin-top: 2rem;">
-                <h3>View Data Tables</h3>
+                <h3 data-translate="view_data_tables">View Data Tables</h3>
                 <div class="table-type-selector">
                     <button class="btn btn-secondary table-type-btn active" data-type="customers">
-                        <i class="fas fa-users"></i> Customers
+                        <i class="fas fa-users"></i> <span data-translate="customers">Customers</span>
                     </button>
                     <button class="btn btn-secondary table-type-btn" data-type="measurements">
-                        <i class="fas fa-tape"></i> Measurements
+                        <i class="fas fa-tape"></i> <span data-translate="measurements">Measurements</span>
                     </button>
                     <button class="btn btn-secondary table-type-btn" data-type="orders">
-                        <i class="fas fa-shopping-bag"></i> Orders
+                        <i class="fas fa-shopping-bag"></i> <span data-translate="orders">Orders</span>
                     </button>
                 </div>
             </div>

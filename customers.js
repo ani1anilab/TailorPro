@@ -1,4 +1,4 @@
-// Customer management module
+// Customers management module
 const Customers = {
     currentCustomers: [],
 
@@ -8,12 +8,9 @@ const Customers = {
     },
 
     bindEvents() {
-        // Navigation
         document.getElementById('addCustomerBtn').addEventListener('click', () => this.showCustomerModal());
         document.getElementById('customerForm').addEventListener('submit', (e) => this.handleCustomerSubmit(e));
         document.getElementById('cancelCustomer').addEventListener('click', () => this.hideCustomerModal());
-        
-        // Search
         document.getElementById('customerSearch').addEventListener('input', (e) => this.searchCustomers(e.target.value));
 
         // Modal close
@@ -29,39 +26,34 @@ const Customers = {
         const customers = filteredCustomers || this.currentCustomers;
         const tbody = document.getElementById('customersTableBody');
         
+        if (customers.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No customers found.</td></tr>';
+            return;
+        }
+
         tbody.innerHTML = customers.map(customer => `
             <tr>
-                <td>${customer.name}</td>
-                <td>${customer.phone}</td>
-                <td>${customer.village}</td>
+                <td onclick="Customers.viewMeasurements(${customer.id})" style="cursor: pointer;">${customer.name}</td>
+                <td onclick="Customers.viewMeasurements(${customer.id})" style="cursor: pointer;">${customer.phone}</td>
+                <td onclick="Customers.viewMeasurements(${customer.id})" style="cursor: pointer;">${customer.village}</td>
                 <td>
                     <button class="btn btn-sm btn-secondary" onclick="Customers.editCustomer(${customer.id})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-sm btn-info" onclick="Customers.viewMeasurements(${customer.id})">
-                        <i class="fas fa-tape"></i> Measurements
+                        <i class="fas fa-edit"></i> <span>Edit</span>
                     </button>
                     <button class="btn btn-sm btn-danger" onclick="Customers.deleteCustomer(${customer.id})">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash"></i> <span>Delete</span>
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="Customers.viewMeasurements(${customer.id})">
+                        <i class="fas fa-tape"></i> <span class="action-text">Measurements</span>
                     </button>
                 </td>
             </tr>
         `).join('');
-    },
 
-    searchCustomers(query) {
-        if (!query.trim()) {
-            this.renderCustomers();
-            return;
+        // Translate any dynamic action text if translation manager exists
+        if (typeof TranslationManager !== 'undefined') {
+            TranslationManager.translateDynamicContent(tbody);
         }
-
-        const filtered = this.currentCustomers.filter(customer => 
-            customer.name.toLowerCase().includes(query.toLowerCase()) ||
-            customer.phone.includes(query) ||
-            customer.village.toLowerCase().includes(query.toLowerCase())
-        );
-
-        this.renderCustomers(filtered);
     },
 
     showCustomerModal(customer = null) {
@@ -105,6 +97,11 @@ const Customers = {
         this.loadCustomers();
         this.hideCustomerModal();
         Dashboard.updateStats();
+        
+        // Refresh measurements customer selects
+        if (typeof Measurements !== 'undefined') {
+            Measurements.populateCustomerSelects();
+        }
     },
 
     editCustomer(id) {
@@ -115,10 +112,13 @@ const Customers = {
     },
 
     deleteCustomer(id) {
+        const customer = this.currentCustomers.find(c => c.id === id);
+        if (!customer) return;
+        
         CustomPopup.show({
             icon: 'fas fa-trash',
             title: 'Delete Customer',
-            message: 'Are you sure you want to delete this customer? This action cannot be undone.',
+            message: `Are you sure you want to delete "${customer.name}"? This action cannot be undone.`,
             confirmText: 'Delete',
             confirmClass: 'btn-danger',
             onConfirm: () => {
@@ -129,18 +129,59 @@ const Customers = {
         });
     },
 
+    searchCustomers(query) {
+        if (!query.trim()) {
+            this.renderCustomers();
+            return;
+        }
+
+        const filtered = this.currentCustomers.filter(customer => 
+            customer.name.toLowerCase().includes(query.toLowerCase()) ||
+            customer.phone.includes(query) ||
+            customer.village.toLowerCase().includes(query.toLowerCase())
+        );
+
+        this.renderCustomers(filtered);
+    },
+
     viewMeasurements(customerId) {
         // Navigate to measurements section
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector('[data-section="measurements"]').classList.add('active');
-        
+        const measurementsNav = document.querySelector('.nav-btn[data-section="measurements"]');
+        if (measurementsNav) measurementsNav.classList.add('active');
+
         document.querySelectorAll('.content-section').forEach(section => {
             section.classList.remove('active');
         });
-        document.getElementById('measurements').classList.add('active');
-        
-        // Set the customer filter
-        document.getElementById('measurementCustomerSelect').value = customerId;
-        Measurements.filterByCustomer(customerId);
+        const measurementsSection = document.getElementById('measurements');
+        if (measurementsSection) measurementsSection.classList.add('active');
+
+        // Set mobile header title if present
+        const mobileHeaderTitle = document.getElementById('mobileHeaderTitle');
+        if (mobileHeaderTitle) mobileHeaderTitle.textContent = 'Measurements';
+
+        // Ensure Measurements module exists and sync filter
+        if (typeof Measurements !== 'undefined') {
+            // populate selects (in case customers changed) and set filter select value
+            Measurements.populateCustomerSelects();
+
+            const filterSelect = document.getElementById('measurementCustomerSelect');
+            if (filterSelect) {
+                filterSelect.value = customerId;
+                
+                // Update the searchable select input to show the customer's name
+                const wrapper = filterSelect.closest('.searchable-select-wrapper');
+                if (wrapper) {
+                    const searchInput = wrapper.querySelector('.select-search-input');
+                    const selectedOption = filterSelect.options[filterSelect.selectedIndex];
+                    if (searchInput && selectedOption) {
+                        searchInput.value = selectedOption.textContent;
+                    }
+                }
+                
+                // dispatch change so Measurements.filterByCustomer runs (handles parsing and UI sync)
+                filterSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+        }
     }
 };

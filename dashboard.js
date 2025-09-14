@@ -4,7 +4,6 @@ const Dashboard = {
         this.updateStats();
         this.setupNavigation();
         this.setupThemeSupport();
-        this.setupLanguageSupport();
     },
 
     updateStats() {
@@ -89,28 +88,13 @@ const Dashboard = {
     },
 
     updateThemeIcon(theme) {
-        const icon = document.querySelector('#themeToggle i');
-        icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
-    },
-
-    setupLanguageSupport() {
-        const languageSelect = document.getElementById('languageSelect');
-        
-        // Load saved language
-        const savedLanguage = localStorage.getItem('selectedLanguage') || 'en';
-        languageSelect.value = savedLanguage;
-        
-        // Handle language change
-        languageSelect.addEventListener('change', (e) => {
-            const selectedLanguage = e.target.value;
-            localStorage.setItem('selectedLanguage', selectedLanguage);
-            
-            if (selectedLanguage !== 'en') {
-                TranslationManager.translatePage(selectedLanguage);
-            } else {
-                location.reload();
+        const themeToggle = document.getElementById('themeToggle');
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            if (icon) {
+                icon.className = theme === 'dark' ? 'fas fa-sun' : 'fas fa-moon';
             }
-        });
+        }
     },
 
     showSection(sectionName) {

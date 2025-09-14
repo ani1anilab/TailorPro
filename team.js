@@ -1,39 +1,17 @@
-// Team management module - Updated with new layout and functionality
+// Team management module
 const Team = {
     currentTeam: [],
 
     init() {
         this.loadTeam();
         this.bindEvents();
-        this.ensureDefaultOwner();
-    },
-
-    ensureDefaultOwner() {
-        const data = Storage.getAllData();
-        if (!data.teamMembers || data.teamMembers.length === 0) {
-            const defaultOwner = {
-                id: Date.now(),
-                name: 'Owner',
-                role: 'Owner/Administrator',
-                phone: '',
-                email: '',
-                createdAt: new Date().toISOString(),
-                isDefault: true
-            };
-            
-            if (!data.teamMembers) data.teamMembers = [];
-            data.teamMembers.push(defaultOwner);
-            Storage.saveAllData(data);
-            this.loadTeam();
-        }
     },
 
     bindEvents() {
-        // Team section events
-        document.getElementById('addTeamMemberBtn')?.addEventListener('click', () => this.showTeamMemberModal());
-        document.getElementById('teamMemberForm')?.addEventListener('submit', (e) => this.handleTeamMemberSubmit(e));
-        document.getElementById('cancelTeamMember')?.addEventListener('click', () => this.hideTeamMemberModal());
-        
+        document.getElementById('addTeamMemberBtn').addEventListener('click', () => this.showTeamMemberModal());
+        document.getElementById('teamMemberForm').addEventListener('submit', (e) => this.handleTeamMemberSubmit(e));
+        document.getElementById('cancelTeamMember').addEventListener('click', () => this.hideTeamMemberModal());
+
         // Modal close
         const closeBtn = document.querySelector('#teamMemberModal .close');
         if (closeBtn) {
@@ -44,20 +22,18 @@ const Team = {
     loadTeam() {
         const data = Storage.getAllData();
         this.currentTeam = data.teamMembers || [];
-        this.renderTeamMembers();
-        this.updateOrderTeamSelects();
+        this.renderTeam();
     },
 
-    renderTeamMembers() {
+    renderTeam() {
         const container = document.getElementById('teamMembersList');
-        if (!container) return;
-
+        
         if (this.currentTeam.length === 0) {
             container.innerHTML = `
                 <div class="team-empty-state">
-                    <i class="fas fa-users-cog"></i>
-                    <h4>No Team Members Yet</h4>
-                    <p>Start by adding your first team member to manage and assign orders.</p>
+                    <i class="fas fa-users"></i>
+                    <h4>No team members found</h4>
+                    <p>Add team members to manage assignments</p>
                 </div>
             `;
             return;
@@ -65,31 +41,24 @@ const Team = {
 
         container.innerHTML = this.currentTeam.map(member => `
             <div class="team-member-card">
-                ${member.isDefault ? '<div class="team-member-default">DEFAULT</div>' : ''}
                 <div class="team-member-header">
                     <div>
                         <div class="team-member-name">${member.name}</div>
                         <div class="team-member-role">${member.role}</div>
                     </div>
+                    ${member.isDefault ? '<span class="team-member-default">Default</span>' : ''}
                 </div>
                 <div class="team-member-info">
                     ${member.phone ? `<p><i class="fas fa-phone"></i> ${member.phone}</p>` : ''}
                     ${member.email ? `<p><i class="fas fa-envelope"></i> ${member.email}</p>` : ''}
-                    <p><i class="fas fa-calendar"></i> Joined ${Utils.formatDate(member.createdAt)}</p>
                 </div>
                 <div class="team-member-actions">
-                    ${!member.isDefault ? `
-                        <button class="btn btn-sm btn-secondary" onclick="Team.editTeamMember(${member.id})">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                        <button class="btn btn-sm btn-danger" onclick="Team.deleteTeamMember(${member.id})">
-                            <i class="fas fa-trash"></i> Delete
-                        </button>
-                    ` : `
-                        <button class="btn btn-sm btn-secondary" onclick="Team.editTeamMember(${member.id})">
-                            <i class="fas fa-edit"></i> Edit
-                        </button>
-                    `}
+                    <button class="btn btn-sm btn-secondary" onclick="Team.editTeamMember(${member.id})">
+                        <i class="fas fa-edit"></i> <span class="action-text">Edit</span>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="Team.deleteTeamMember(${member.id})">
+                        <i class="fas fa-trash"></i> <span class="action-text">Delete</span>
+                    </button>
                 </div>
             </div>
         `).join('');
@@ -110,6 +79,12 @@ const Team = {
             document.getElementById('teamMemberId').value = '';
         }
 
+        // Update modal title
+        const modalTitle = modal.querySelector('h3');
+        if (modalTitle) {
+            modalTitle.setAttribute('data-translate', member ? 'edit_team_member' : 'add_team_member');
+        }
+
         modal.style.display = 'block';
     },
 
@@ -120,44 +95,39 @@ const Team = {
     handleTeamMemberSubmit(e) {
         e.preventDefault();
 
-        const memberData = {
+        const teamMemberData = {
             name: document.getElementById('teamMemberName').value,
             role: document.getElementById('teamMemberRole').value,
-            phone: document.getElementById('teamMemberPhone').value,
-            email: document.getElementById('teamMemberEmail').value
+            phone: document.getElementById('teamMemberPhone').value || null,
+            email: document.getElementById('teamMemberEmail').value || null
         };
 
-        const memberId = document.getElementById('teamMemberId').value;
+        const teamMemberId = document.getElementById('teamMemberId').value;
 
-        if (memberId) {
-            this.updateTeamMember(parseInt(memberId), memberData);
+        if (teamMemberId) {
+            // Update existing team member
+            const data = Storage.getAllData();
+            const memberIndex = data.teamMembers.findIndex(m => m.id === parseInt(teamMemberId));
+            if (memberIndex !== -1) {
+                data.teamMembers[memberIndex] = { ...data.teamMembers[memberIndex], ...teamMemberData };
+                Storage.saveAllData(data);
+            }
         } else {
-            this.addTeamMember(memberData);
+            // Add new team member
+            const data = Storage.getAllData();
+            teamMemberData.id = data.nextTeamMemberId || 1;
+            data.nextTeamMemberId = (data.nextTeamMemberId || 1) + 1;
+            data.teamMembers = data.teamMembers || [];
+            data.teamMembers.push(teamMemberData);
+            Storage.saveAllData(data);
         }
 
-        this.hideTeamMemberModal();
-    },
-
-    addTeamMember(memberData) {
-        const data = Storage.getAllData();
-        if (!data.teamMembers) data.teamMembers = [];
-        
-        memberData.id = Date.now();
-        memberData.createdAt = new Date().toISOString();
-        data.teamMembers.push(memberData);
-        
-        Storage.saveAllData(data);
         this.loadTeam();
-    },
-
-    updateTeamMember(id, updates) {
-        const data = Storage.getAllData();
-        const index = data.teamMembers.findIndex(m => m.id === id);
+        this.hideTeamMemberModal();
         
-        if (index !== -1) {
-            data.teamMembers[index] = { ...data.teamMembers[index], ...updates };
-            Storage.saveAllData(data);
-            this.loadTeam();
+        // Update order team member dropdowns if Orders module is loaded
+        if (typeof Orders !== 'undefined') {
+            Orders.populateTeamMemberSelects();
         }
     },
 
@@ -183,29 +153,43 @@ const Team = {
                 data.teamMembers = data.teamMembers.filter(m => m.id !== id);
                 Storage.saveAllData(data);
                 this.loadTeam();
+                
+                // Update order team member dropdowns if Orders module is loaded
+                if (typeof Orders !== 'undefined') {
+                    Orders.populateTeamMemberSelects();
+                }
             }
         });
     },
 
-    updateOrderTeamSelects() {
-        // Update team member selects in order modal
-        const teamSelect = document.getElementById('orderTeamMember');
-        if (teamSelect) {
-            const currentValue = teamSelect.value;
-            teamSelect.innerHTML = '<option value="">Select Team Member</option>';
+    getTeamMemberById(id) {
+        return this.currentTeam.find(m => m.id === id);
+    },
+
+    populateTeamMemberSelects() {
+        const selects = [
+            document.getElementById('orderTeamMember')
+        ];
+
+        selects.forEach(select => {
+            if (!select) return;
+            
+            const currentValue = select.value;
+            select.innerHTML = '<option value="">Select Team Member (Optional)</option>';
             
             this.currentTeam.forEach(member => {
                 const option = document.createElement('option');
                 option.value = member.id;
                 option.textContent = `${member.name} (${member.role})`;
-                teamSelect.appendChild(option);
+                select.appendChild(option);
             });
-            
-            teamSelect.value = currentValue;
-        }
-    },
 
-    getTeamMemberById(id) {
-        return this.currentTeam.find(m => m.id === id);
+            select.value = currentValue;
+        });
     }
 };
+
+// Initialize Team module when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    Team.init();
+});

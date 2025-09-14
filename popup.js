@@ -1,4 +1,4 @@
-// Custom popup functionality
+// Custom popup functionality - Updated with translation support
 const CustomPopup = {
     show: function(options) {
         const modal = document.getElementById('customPopup');
@@ -11,15 +11,17 @@ const CustomPopup = {
         // Set content
         icon.className = options.icon || 'fas fa-exclamation-triangle';
         title.textContent = options.title || 'Confirm Action';
+        title.setAttribute('data-translate', 'popup_title');
         message.textContent = options.message || 'Are you sure you want to perform this action?';
+        message.setAttribute('data-translate', 'popup_message');
+        confirmBtn.textContent = options.confirmText || 'Confirm';
+        confirmBtn.setAttribute('data-translate', 'popup_confirm');
+        cancelBtn.textContent = options.cancelText || 'Cancel';
+        cancelBtn.setAttribute('data-translate', 'popup_cancel');
         
         // Set button visibility
         confirmBtn.style.display = options.showConfirm !== false ? 'inline-flex' : 'none';
         cancelBtn.style.display = options.showCancel !== false ? 'inline-flex' : 'none';
-        
-        // Set button text
-        confirmBtn.textContent = options.confirmText || 'Confirm';
-        cancelBtn.textContent = options.cancelText || 'Cancel';
         
         // Set button types
         confirmBtn.className = `btn ${options.confirmClass || 'btn-primary'}`;
@@ -52,6 +54,11 @@ const CustomPopup = {
         
         // Show modal
         modal.style.display = 'flex';
+
+        // Translate the popup content
+        if (typeof TranslationManager !== 'undefined') {
+            TranslationManager.translateDynamicContent(modal);
+        }
     },
     
     hide: function() {

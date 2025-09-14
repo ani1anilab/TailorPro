@@ -14,30 +14,30 @@
         
         <!-- Sidebar Navigation -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
+            <div class="sidebar-header" data-no-translate="true">
                 <h1><i class="fas fa-scissors"></i> TailorPro</h1>
             </div>
             <nav class="sidebar-nav">
                 <button class="nav-btn active" data-section="dashboard">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <i class="fas fa-tachometer-alt"></i> <span class="nav-text">Dashboard</span>
                 </button>
                 <button class="nav-btn" data-section="customers">
-                    <i class="fas fa-users"></i> Customers
+                    <i class="fas fa-users"></i> <span class="nav-text">Customers</span>
                 </button>
                 <button class="nav-btn" data-section="measurements">
-                    <i class="fas fa-tape"></i> Measurements
+                    <i class="fas fa-tape"></i> <span class="nav-text">Measurements</span>
                 </button>
                 <button class="nav-btn" data-section="orders">
-                    <i class="fas fa-shopping-bag"></i> Orders
+                    <i class="fas fa-shopping-bag"></i> <span class="nav-text">Orders</span>
                 </button>
                 <button class="nav-btn" data-section="team">
-                    <i class="fas fa-users-cog"></i> Team Manage
+                    <i class="fas fa-users-cog"></i> <span class="nav-text">Team Manage</span>
                 </button>
                 <button class="nav-btn" data-section="export">
-                    <i class="fas fa-download"></i> Export Data
+                    <i class="fas fa-download"></i> <span class="nav-text">Export Data</span>
                 </button>
                 <button class="nav-btn" data-section="settings">
-                    <i class="fas fa-cog"></i> Settings
+                    <i class="fas fa-cog"></i> <span class="nav-text">Settings</span>
                 </button>
             </nav>
             <div class="theme-toggle">
@@ -45,12 +45,15 @@
                     <i class="fas fa-moon"></i>
                 </button>
             </div>
-            <div class="language-selector">
+            <div class="language-selector" data-no-translate="true">
                 <select id="languageSelect">
                     <option value="en">English</option>
                     <option value="hi">हिंदी</option>
                     <option value="gu">ગુજરાતી</option>
                 </select>
+                <small style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                    <i class="fas fa-language"></i> <span class="language-label">Application Language</span>
+                </small>
             </div>
         </aside>
 
@@ -67,36 +70,36 @@
             <!-- Dashboard Section -->
             <section id="dashboard" class="content-section active">
                 <div class="section-header">
-                    <h2>Dashboard Overview</h2>
-                    <p class="section-subtitle">Welcome to your tailor management system</p>
+                    <h2 data-translate="dashboard_title">Dashboard Overview</h2>
+                    <p class="section-subtitle" data-translate="dashboard_subtitle">Welcome to your tailor management system</p>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <i class="fas fa-users stat-icon"></i>
                         <div class="stat-info">
                             <h3 id="totalCustomers">0</h3>
-                            <p>Total Customers</p>
+                            <p data-translate="total_customers">Total Customers</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-clock stat-icon"></i>
                         <div class="stat-info">
                             <h3 id="pendingOrders">0</h3>
-                            <p>Pending Orders</p>
+                            <p data-translate="pending_orders">Pending Orders</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-check-circle stat-icon"></i>
                         <div class="stat-info">
                             <h3 id="completedOrders">0</h3>
-                            <p>Completed Orders</p>
+                            <p data-translate="completed_orders">Completed Orders</p>
                         </div>
                     </div>
                     <div class="stat-card">
                         <i class="fas fa-chart-line stat-icon"></i>
                         <div class="stat-info">
                             <h3 id="totalRevenue">₹0</h3>
-                            <p>Total Revenue</p>
+                            <p data-translate="total_revenue">Total Revenue</p>
                         </div>
                     </div>
                 </div>
@@ -105,22 +108,22 @@
             <!-- Customers Section -->
             <section id="customers" class="content-section">
                 <div class="section-header">
-                    <h2>Customer Management</h2>
+                    <h2 data-translate="customers_title">Customer Management</h2>
                     <button class="btn btn-primary" id="addCustomerBtn">
-                        <i class="fas fa-plus"></i> Add Customer
+                        <i class="fas fa-plus"></i> <span data-translate="add_customer">Add Customer</span>
                     </button>
                 </div>
                 <div class="search-container">
-                    <input type="text" id="customerSearch" placeholder="Search customers..." class="search-input">
+                    <input type="text" id="customerSearch" placeholder="Search customers..." class="search-input" data-translate-placeholder="search_customers">
                 </div>
                 <div class="table-container">
                     <table class="data-table" id="customersTable">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Phone</th>
-                                <th>Village</th>
-                                <th>Actions</th>
+                                <th data-translate="customer_name">Name</th>
+                                <th data-translate="customer_phone">Phone</th>
+                                <th data-translate="customer_village">Village</th>
+                                <th data-translate="customer_actions">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="customersTableBody">
@@ -132,23 +135,23 @@
             <!-- Measurements Section -->
             <section id="measurements" class="content-section">
                 <div class="section-header">
-                    <h2>Measurements</h2>
+                    <h2 data-translate="measurements_title">Measurements</h2>
                     <div style="display: flex; gap: 1rem;">
                         <button class="btn btn-secondary" id="manageFieldsBtn">
-                            <i class="fas fa-cog"></i> Manage Fields
+                            <i class="fas fa-cog"></i> <span data-translate="manage_fields">Manage Fields</span>
                         </button>
                         <button class="btn btn-primary" id="addMeasurementBtn">
-                            <i class="fas fa-plus"></i> Add Measurement
+                            <i class="fas fa-plus"></i> <span data-translate="add_measurement">Add Measurement</span>
                         </button>
                     </div>
                 </div>
                 <div class="customer-selector">
-                    <select id="measurementCustomerSelect" class="minimal-select">
-                        <option value="">All Customers</option>
+                    <select id="measurementCustomerSelect" class="minimal-select searchable-select" data-searchable="true">
+                        <option value="" data-translate="all_customers">All Customers</option>
                     </select>
                 </div>
                 <div class="search-container">
-                    <input type="text" id="measurementSearch" placeholder="Search measurements by customer, clothing type, or values..." class="search-input">
+                    <input type="text" id="measurementSearch" placeholder="Search measurements by customer, clothing type, or values..." class="search-input" data-translate-placeholder="search_measurements">
                 </div>
                 <div id="measurementsList" class="measurements-grid">
                 </div>
@@ -157,9 +160,9 @@
             <!-- Orders Section -->
             <section id="orders" class="content-section">
                 <div class="section-header">
-                    <h2>Order Management</h2>
+                    <h2 data-translate="orders_title">Order Management</h2>
                     <button class="btn btn-primary" id="addOrderBtn">
-                        <i class="fas fa-plus"></i> Add Order
+                        <i class="fas fa-plus"></i> <span data-translate="add_order">Add Order</span>
                     </button>
                 </div>
                 <div class="orders-container" id="ordersList">
@@ -169,17 +172,17 @@
             <!-- Export Section -->
             <section id="export" class="content-section">
                 <div class="section-header">
-                    <h2>Export Data</h2>
+                    <h2 data-translate="export_title">Export Data</h2>
                 </div>
                 <div class="export-options">
                     <button class="btn btn-secondary" id="exportCustomers">
-                        <i class="fas fa-file-csv"></i> Export Customers
+                        <i class="fas fa-file-csv"></i> <span data-translate="export_customers">Export Customers</span>
                     </button>
                     <button class="btn btn-secondary" id="exportMeasurements">
-                        <i class="fas fa-file-csv"></i> Export Measurements
+                        <i class="fas fa-file-csv"></i> <span data-translate="export_measurements">Export Measurements</span>
                     </button>
                     <button class="btn btn-secondary" id="exportOrders">
-                        <i class="fas fa-file-csv"></i> Export Orders
+                        <i class="fas fa-file-csv"></i> <span data-translate="export_orders">Export Orders</span>
                     </button>
                 </div>
             </section>
@@ -187,108 +190,61 @@
             <!-- Settings Section -->
             <section id="settings" class="content-section">
                 <div class="section-header">
-                    <h2>Settings</h2>
-                    <p class="section-subtitle">Manage your application preferences and measurement fields</p>
+                    <h2 data-translate="settings_title">Settings</h2>
+                    <p class="section-subtitle" data-translate="settings_subtitle">Manage your application preferences and measurement fields</p>
                 </div>
                 
                 <!-- Settings tabs navigation - Only measurements now -->
                 <div class="settings-tabs-nav">
                     <div class="settings-tabs">
                         <button class="settings-tab-btn active" data-tab="measurement">
-                            <i class="fas fa-tape"></i> Measurements
+                            <i class="fas fa-tape"></i> <span data-translate="measurements_tab">Measurements</span>
                         </button>
                     </div>
                 </div>
                 
                 <div class="settings-container">
                     <div class="settings-card">
-                        <h3><i class="fas fa-tape"></i> Measurement Settings</h3>
+                        <h3><i class="fas fa-tape"></i> <span data-translate="measurement_settings">Measurement Settings</span></h3>
                         <div class="setting-item">
-                            <label for="sizeFormatSettings">Measurement Unit</label>
+                            <label for="sizeFormatSettings" data-translate="measurement_unit">Measurement Unit</label>
                             <select id="sizeFormatSettings" class="minimal-select">
-                                <option value="inches">Inches (")</option>
-                                <option value="centimeters">Centimeters (cm)</option>
-                                <option value="millimeters">Millimeters (mm)</option>
+                                <option value="inches" data-translate="inches">Inches (")</option>
+                                <option value="centimeters" data-translate="centimeters">Centimeters (cm)</option>
+                                <option value="millimeters" data-translate="millimeters">Millimeters (mm)</option>
                             </select>
                         </div>
                         <div class="setting-item">
-                            <label for="dateFormatSettings">Date Format</label>
+                            <label for="dateFormatSettings" data-translate="date_format">Date Format</label>
                             <select id="dateFormatSettings" class="minimal-select">
-                                <option value="MM/DD/YYYY">MM/DD/YYYY (12/31/2023)</option>
-                                <option value="DD/MM/YYYY">DD/MM/YYYY (31/12/2023)</option>
-                                <option value="YYYY-MM-DD">YYYY-MM-DD (2023-12-31)</option>
-                                <option value="DD-MM-YYYY">DD-MM-YYYY (31-12-2023)</option>
-                                <option value="MMM DD, YYYY">MMM DD, YYYY (Dec 31, 2023)</option>
-                                <option value="DD MMM YYYY">DD MMM YYYY (31 Dec 2023)</option>
+                                <option value="MM/DD/YYYY" data-translate="mmddyyyy">MM/DD/YYYY (12/31/2023)</option>
+                                <option value="DD/MM/YYYY" data-translate="ddmmyyyy">DD/MM/YYYY (31/12/2023)</option>
+                                <option value="YYYY-MM-DD" data-translate="yyyymmdd">YYYY-MM-DD (2023-12-31)</option>
+                                <option value="DD-MM-YYYY" data-translate="ddmmyyyy_hyphen">DD-MM-YYYY (31-12-2023)</option>
+                                <option value="MMM DD, YYYY" data-translate="mmmddyyyy">MMM DD, YYYY (Dec 31, 2023)</option>
+                                <option value="DD MMM YYYY" data-translate="ddmmmyyyy">DD MMM YYYY (31 Dec 2023)</option>
                             </select>
                         </div>
                         <div class="setting-item">
-                            <label>Default Measurement Fields</label>
+                            <label data-translate="default_fields">Default Measurement Fields</label>
                             <div id="defaultFieldsSettings" class="fields-container">
                                 <!-- Default fields will be loaded here -->
                             </div>
                         </div>
                         <div class="setting-item">
-                            <label>Custom Measurement Fields</label>
+                            <label data-translate="custom_fields">Custom Measurement Fields</label>
                             <div id="customFieldsSettings" class="fields-container">
                                 <!-- Custom fields will be loaded here -->
                             </div>
                             <div class="add-field-section">
-                                <input type="text" id="newFieldNameSettings" placeholder="Enter field name (e.g., Neck, Wrist, Ankle)">
+                                <input type="text" id="newFieldNameSettings" placeholder="Enter field name (e.g., Neck, Wrist)" data-translate-placeholder="enter_field_name">
                                 <button class="btn btn-primary" onclick="Settings.addCustomField()">
-                                    <i class="fas fa-plus"></i> Add Field
+                                    <i class="fas fa-plus"></i> <span data-translate="add_field">Add Field</span>
                                 </button>
                             </div>
                             <small style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
-                                <i class="fas fa-info-circle"></i> Add custom measurement fields that will appear in all clothing types
+                                <i class="fas fa-info-circle"></i> <span data-translate="custom_fields_info">Add custom measurement fields that will appear in all clothing types</span>
                             </small>
-                        </div>
-
-                    <div class="settings-card">
-                        <h3><i class="fas fa-palette"></i> Appearance</h3>
-                        <div class="setting-item">
-                            <label>Theme</label>
-                            <div class="theme-options">
-                                <button class="btn btn-secondary theme-option" data-theme="light">
-                                    <i class="fas fa-sun"></i> Light
-                                </button>
-                                <button class="btn btn-secondary theme-option" data-theme="dark">
-                                    <i class="fas fa-moon"></i> Dark
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <h3><i class="fas fa-language"></i> Language</h3>
-                        <div class="setting-item">
-                            <label for="languageSettings">Application Language</label>
-                            <select id="languageSettings" class="minimal-select">
-                                <option value="en">English</option>
-                                <option value="hi">हिंदी</option>
-                                <option value="gu">ગુજરાતી</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="settings-card">
-                        <h3><i class="fas fa-database"></i> Data Management</h3>
-                        <div class="setting-item">
-                            <label>Backup & Restore</label>
-                            <div class="backup-options">
-                                <button class="btn btn-secondary" onclick="Settings.exportData()">
-                                    <i class="fas fa-download"></i> Export All Data
-                                </button>
-                                <button class="btn btn-secondary" onclick="Settings.importData()">
-                                    <i class="fas fa-upload"></i> Import Data
-                                </button>
-                            </div>
-                        </div>
-                        <div class="setting-item">
-                            <label>Reset Data</label>
-                            <button class="btn btn-danger" onclick="Settings.resetAllData()">
-                                <i class="fas fa-trash"></i> Reset All Data
-                            </button>
                         </div>
                     </div>
                 </div>
@@ -297,9 +253,9 @@
             <!-- Team Management Section -->
             <section id="team" class="content-section">
                 <div class="section-header">
-                    <h2>Team Management</h2>
+                    <h2 data-translate="team_title">Team Management</h2>
                     <button class="btn btn-primary" id="addTeamMemberBtn">
-                        <i class="fas fa-plus"></i> Add Team Member
+                        <i class="fas fa-plus"></i> <span data-translate="add_team_member">Add Team Member</span>
                     </button>
                 </div>
                 <div class="team-container">
@@ -330,24 +286,24 @@
         <div id="customerModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h3>Customer Details</h3>
+                <h3 data-translate="customer_details">Customer Details</h3>
                 <form id="customerForm">
                     <input type="hidden" id="customerId">
                     <div class="form-group">
-                        <label for="customerName">Name</label>
+                        <label for="customerName" data-translate="customer_name">Name</label>
                         <input type="text" id="customerName" required>
                     </div>
                     <div class="form-group">
-                        <label for="customerPhone">Phone</label>
+                        <label for="customerPhone" data-translate="customer_phone">Phone</label>
                         <input type="tel" id="customerPhone" required>
                     </div>
                     <div class="form-group">
-                        <label for="customerVillage">Village</label>
+                        <label for="customerVillage" data-translate="customer_village">Village</label>
                         <input type="text" id="customerVillage" required>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-secondary" id="cancelCustomer">Cancel</button>
+                        <button type="submit" class="btn btn-primary" data-translate="save">Save</button>
+                        <button type="button" class="btn btn-secondary" id="cancelCustomer" data-translate="cancel">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -356,34 +312,30 @@
         <div id="measurementModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h3>Measurement Details</h3>
+                <h3 data-translate="measurement_details">Measurement Details</h3>
                 <form id="measurementForm">
                     <input type="hidden" id="measurementId">
                     <div class="form-group">
-                        <label for="measurementCustomer">Customer</label>
-                        <select id="measurementCustomer" required>
-                            <option value="">Select Customer</option>
+                        <label for="measurementCustomer" data-translate="customer">Customer</label>
+                        <select id="measurementCustomer" required class="searchable-select" data-searchable="true">
+                            <option value="" data-translate="select_customer">Select Customer</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="clothingType">Clothing Type</label>
+                        <label for="clothingType" data-translate="clothing_type">Clothing Type</label>
                         <select id="clothingType" required>
-                            <option value="shirt">Shirt</option>
-                            <option value="pant">Pant</option>
-                            <option value="suit">Suit</option>
-                            <option value="dress">Dress</option>
-                            <option value="other">Other</option>
+                            <option value="other" data-translate="other">Other</option>
                         </select>
                     </div>
                     <div id="customTypeContainer" class="form-group" style="display: none;">
-                        <label for="customClothingType">Custom Clothing Type</label>
-                        <input type="text" id="customClothingType" placeholder="Enter custom clothing type">
+                        <label for="customClothingType" data-translate="custom_clothing_type">Custom Clothing Type</label>
+                        <input type="text" id="customClothingType" placeholder="Enter custom clothing type" data-translate-placeholder="enter_custom_clothing_type">
                     </div>
                     <div id="measurementFields" class="measurement-fields">
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-secondary" id="cancelMeasurement">Cancel</button>
+                        <button type="submit" class="btn btn-primary" data-translate="save">Save</button>
+                        <button type="button" class="btn btn-secondary" id="cancelMeasurement" data-translate="cancel">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -392,40 +344,40 @@
         <div id="orderModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h3>Order Details</h3>
+                <h3 data-translate="order_details">Order Details</h3>
                 <form id="orderForm">
                     <input type="hidden" id="orderId">
                     <div class="form-group">
-                        <label for="orderCustomer">Customer</label>
-                        <select id="orderCustomer" required>
-                            <option value="">Select Customer</option>
+                        <label for="orderCustomer" data-translate="customer">Customer</label>
+                        <select id="orderCustomer" required class="searchable-select" data-searchable="true">
+                            <option value="" data-translate="select_customer">Select Customer</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="orderTeamMember">Assigned Team Member</label>
+                        <label for="orderTeamMember" data-translate="assigned_team_member">Assigned Team Member</label>
                         <select id="orderTeamMember">
-                            <option value="">Select Team Member (Optional)</option>
+                            <option value="" data-translate="select_team_member_optional">Select Team Member (Optional)</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="orderDescription">Description</label>
+                        <label for="orderDescription" data-translate="description">Description</label>
                         <textarea id="orderDescription" required></textarea>
                     </div>
                     <div class="form-group">
-                        <label for="orderPrice">Price</label>
+                        <label for="orderPrice" data-translate="price">Price</label>
                         <input type="number" id="orderPrice" min="0" step="0.01" required>
                     </div>
                     <div class="form-group">
-                        <label for="orderStatus">Status</label>
+                        <label for="orderStatus" data-translate="status">Status</label>
                         <select id="orderStatus" required>
-                            <option value="pending">Pending</option>
-                            <option value="working">Working</option>
-                            <option value="delivered">Delivered</option>
+                            <option value="pending" data-translate="pending">Pending</option>
+                            <option value="working" data-translate="working">Working</option>
+                            <option value="delivered" data-translate="delivered">Delivered</option>
                         </select>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-secondary" id="cancelOrder">Cancel</button>
+                        <button type="submit" class="btn btn-primary" data-translate="save">Save</button>
+                        <button type="button" class="btn btn-secondary" id="cancelOrder" data-translate="cancel">Cancel</button>
                     </div>
                 </form>
             </div>
@@ -434,37 +386,41 @@
         <div id="teamMemberModal" class="modal" style="display: none;">
             <div class="modal-content">
                 <span class="close">&times;</span>
-                <h3>Team Member Details</h3>
+                <h3 data-translate="team_member_details">Team Member Details</h3>
                 <form id="teamMemberForm">
                     <input type="hidden" id="teamMemberId">
                     <div class="form-group">
-                        <label for="teamMemberName">Name</label>
+                        <label for="teamMemberName" data-translate="name">Name</label>
                         <input type="text" id="teamMemberName" required>
                     </div>
                     <div class="form-group">
-                        <label for="teamMemberRole">Role</label>
-                        <input type="text" id="teamMemberRole" placeholder="e.g., Master Tailor, Assistant" required>
+                        <label for="teamMemberRole" data-translate="role">Role</label>
+                        <input type="text" id="teamMemberRole" placeholder="e.g., Master Tailor, Assistant" required data-translate-placeholder="role_placeholder">
                     </div>
                     <div class="form-group">
-                        <label for="teamMemberPhone">Phone</label>
+                        <label for="teamMemberPhone" data-translate="phone">Phone</label>
                         <input type="tel" id="teamMemberPhone">
                     </div>
                     <div class="form-group">
-                        <label for="teamMemberEmail">Email</label>
+                        <label for="teamMemberEmail" data-translate="email">Email</label>
                         <input type="email" id="teamMemberEmail">
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                        <button type="button" class="btn btn-secondary" id="cancelTeamMember">Cancel</button>
+                        <button type="submit" class="btn btn-primary" data-translate="save">Save</button>
+                        <button type="button" class="btn btn-secondary" id="cancelTeamMember" data-translate="cancel">Cancel</button>
                     </div>
                 </form>
             </div>
         </div>
 
+        <!-- Google Translate API script -->
+        <script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
         <script src="storage.js"></script>
         <script src="utils.js"></script>
         <script src="translation.js"></script>
         <script src="popup.js"></script>
+        <script src="searchableSelect.js"></script>
         <script src="customers.js"></script>
         <script src="measurementFields.js"></script>
         <script src="measurements.js"></script>
@@ -476,6 +432,64 @@
         <script>
             // Initialize all modules when DOM is loaded
             document.addEventListener('DOMContentLoaded', () => {
+                // Mobile menu functionality
+                const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+                const sidebar = document.getElementById('sidebar');
+                const sidebarOverlay = document.getElementById('sidebarOverlay');
+                const mobileHeaderTitle = document.getElementById('mobileHeaderTitle');
+
+                if (mobileMenuToggle && sidebar && sidebarOverlay) {
+                    // Toggle sidebar menu
+                    function toggleSidebar() {
+                        sidebar.classList.toggle('open');
+                        sidebarOverlay.classList.toggle('active');
+                        
+                        // Update menu icon
+                        const icon = mobileMenuToggle.querySelector('i');
+                        if (icon) {
+                            icon.className = sidebar.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
+                        }
+                    }
+                    
+                    // Close sidebar
+                    function closeSidebar() {
+                        sidebar.classList.remove('open');
+                        sidebarOverlay.classList.remove('active');
+                        const icon = mobileMenuToggle.querySelector('i');
+                        if(icon) {
+                           icon.className = 'fas fa-bars';
+                        }
+                    }
+                    
+                    // Event listeners
+                    mobileMenuToggle.addEventListener('click', toggleSidebar);
+                    sidebarOverlay.addEventListener('click', closeSidebar);
+                    
+                    // Close sidebar when clicking on nav items
+                    document.querySelectorAll('.nav-btn').forEach(btn => {
+                        btn.addEventListener('click', closeSidebar);
+                    });
+                }
+
+                // Update mobile header title based on active section
+                if (mobileHeaderTitle) {
+                    document.querySelectorAll('.nav-btn').forEach(btn => {
+                        btn.addEventListener('click', (e) => {
+                            const section = e.currentTarget.getAttribute('data-section');
+                            const titleMap = {
+                                'dashboard': 'Dashboard',
+                                'customers': 'Customers',
+                                'measurements': 'Measurements',
+                                'orders': 'Orders',
+                                'team': 'Team Manage',
+                                'export': 'Export Data',
+                                'settings': 'Settings'
+                            };
+                            mobileHeaderTitle.textContent = titleMap[section] || 'Dashboard';
+                        });
+                    });
+                }
+
                 // Initialize Dashboard first
                 if (typeof Dashboard !== 'undefined') {
                     Dashboard.init();
@@ -502,65 +516,6 @@
                 if (typeof Team !== 'undefined') {
                     Team.init();
                 }
-            });
-
-            // Add mobile menu functionality
-            document.addEventListener('DOMContentLoaded', () => {
-                const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-                const sidebar = document.getElementById('sidebar');
-                const sidebarOverlay = document.getElementById('sidebarOverlay');
-                const mobileHeaderTitle = document.getElementById('mobileHeaderTitle');
-                
-                // Toggle sidebar menu
-                function toggleSidebar() {
-                    sidebar.classList.toggle('open');
-                    sidebarOverlay.classList.toggle('active');
-                    
-                    // Update menu icon
-                    const icon = mobileMenuToggle.querySelector('i');
-                    icon.className = sidebar.classList.contains('open') ? 'fas fa-times' : 'fas fa-bars';
-                }
-                
-                // Close sidebar
-                function closeSidebar() {
-                    sidebar.classList.remove('open');
-                    sidebarOverlay.classList.remove('active');
-                    const icon = mobileMenuToggle.querySelector('i');
-                    icon.className = 'fas fa-bars';
-                }
-                
-                // Event listeners
-                mobileMenuToggle.addEventListener('click', toggleSidebar);
-                sidebarOverlay.addEventListener('click', closeSidebar);
-                
-                // Close sidebar when clicking on nav items
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.addEventListener('click', closeSidebar);
-                });
-                
-                // Update mobile header title based on active section
-                document.querySelectorAll('.nav-btn').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        const section = e.currentTarget.getAttribute('data-section');
-                        const titleMap = {
-                            'dashboard': 'Dashboard',
-                            'customers': 'Customers',
-                            'measurements': 'Measurements',
-                            'orders': 'Orders',
-                            'team': 'Team Manage',
-                            'export': 'Export Data',
-                            'settings': 'Settings'
-                        };
-                        mobileHeaderTitle.textContent = titleMap[section] || 'Dashboard';
-                    });
-                });
-                
-                // Handle window resize
-                window.addEventListener('resize', () => {
-                    if (window.innerWidth > 768) {
-                        closeSidebar();
-                    }
-                });
             });
         </script>
     </div>
